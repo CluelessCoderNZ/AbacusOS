@@ -1,18 +1,35 @@
-#![no_std] // Cannot use std library due to OS hooks
-#![no_main] // Since the std library is not included. We must self-define the start point
-use core::panic::PanicInfo;
-mod vga_text;
+#![no_std]
+#![no_main]
+#![feature(custom_test_frameworks)]
+#![test_runner(abacus_os::test_runner)]
+#![reexport_test_harness_main = "test_main"]
 
+use core::panic::PanicInfo;
+use abacus_os::println;
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    println!("Hello World{}", "!");
+
+    abacus_os::init();
+
+    #[cfg(test)]
+        test_main();
+
+    println!("No crashing!");
+    abacus_os::hlt_loop();
+}
+
+/// This function is called on panic.
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    abacus_os::hlt_loop();
 }
 
-// Entry point for kernel
-#[no_mangle] // Forces function symbol to be called _start in linker
-pub extern "C" fn _start() -> ! {
-    panic!("Hello World{}", "!");
-
-    loop {}
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    abacus_os::test_panic_handler(info)
 }
