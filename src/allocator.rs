@@ -12,3 +12,6 @@ unsafe impl GlobalAlloc for Dummy {
         panic!("dealloc should be never called")
     }
 }
+
+#[global_allocator]
+static ALLOCATOR: Dummy = Dummy;

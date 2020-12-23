@@ -7,6 +7,7 @@
 use core::panic::PanicInfo;
 use abacus_os::println;
 use bootloader::{BootInfo, entry_point};
+use alloc::boxed::Box;
 
 entry_point!(kernel_main);
 
@@ -16,6 +17,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     abacus_os::init();
 
+    // Testing dummy allocator
+    let x = Box::new(41);
 
     #[cfg(test)]
         test_main();
