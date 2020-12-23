@@ -5,6 +5,8 @@ use crate::gdt;
 use lazy_static::lazy_static;
 use pic8259_simple::ChainedPics;
 use spin;
+use x86_64::structures::idt::PageFaultErrorCode;
+use crate::hlt_loop;
 
 // Define interrupt controller exception ranges
 pub const PIC_1_OFFSET: u8 = 32;
@@ -39,6 +41,7 @@ lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+        idt.page_fault.set_handler_fn(page_fault_handler);
 
         // Unsafe since the stack index must be unused
         unsafe {
@@ -72,6 +75,20 @@ fn test_breakpoint_exception() {
     x86_64::instructions::interrupts::int3();
     // Function should continue if handler is set correctly...
 }
+
+extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: &mut InterruptStackFrame,
+    error_code: PageFaultErrorCode,
+) {
+    use x86_64::registers::control::Cr2;
+
+    println!("EXCEPTION: PAGE FAULT");
+    println!("Accessed Address: {:?}", Cr2::read());
+    println!("Error Code: {:?}", error_code);
+    println!("{:#?}", stack_frame);
+    hlt_loop();
+}
+
 
 // The double fault handler is trigger whenever an exception occurs while handling an exception
 // Due to edge-cases in exceptions(Guard page hits) the double fault handler operates in a

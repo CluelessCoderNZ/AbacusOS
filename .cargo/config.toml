@@ -1,5 +1,5 @@
 [unstable]
-build-std = ["core", "compiler_builtins"] # Forces rust to recompile core for our custom target
+build-std = ["core", "compiler_builtins", "alloc"] # Forces rust to recompile core for our custom target
 build-std-features = ["compiler-builtins-mem"] # Enables rust to use its own builtin-mem functions
 
 [build]

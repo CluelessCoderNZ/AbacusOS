@@ -6,12 +6,16 @@
 
 use core::panic::PanicInfo;
 use abacus_os::println;
+use bootloader::{BootInfo, entry_point};
+
+entry_point!(kernel_main);
 
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("Hello World{}", "!");
 
     abacus_os::init();
+
 
     #[cfg(test)]
         test_main();
