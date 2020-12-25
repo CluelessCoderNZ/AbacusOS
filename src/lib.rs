@@ -3,6 +3,7 @@
 #![feature(alloc_error_handler)]
 #![feature(const_mut_refs)]
 #![feature(const_in_array_repeat_expressions)]
+#![feature(wake_trait)]
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
@@ -11,6 +12,7 @@
 pub mod serial;
 pub mod vga_text;
 pub mod interrupts;
+pub mod task;
 pub mod gdt;
 pub mod memory;
 pub mod allocator;
